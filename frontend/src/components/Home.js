@@ -1,13 +1,11 @@
 import React from 'react'
-import { useSelector } from 'react-redux'
-import TopBar from './TopBar'
+import PostContent from '../pages/PostContent'
 
 const Home = () => {
- const currentTheme = useSelector((state) => state.theme.theme)
-
+ 
   return (
     <div>
-     <TopBar/>
+     <PostContent/>
     </div>
   )
 }

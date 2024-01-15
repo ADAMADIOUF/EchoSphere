@@ -1,0 +1,186 @@
+import React, { useEffect, useState } from 'react'
+import { useSelector } from 'react-redux'
+import {
+  useDeleteCommentMutation,
+  useDeletePostMutation,
+  useGetPostsQuery,
+  useLikePostMutation,
+  useUnlikePostMutation,
+} from '../slices/postsApiSlice'
+import { FaTrash, FaHeart, FaComment } from 'react-icons/fa'
+import { Button, Card } from 'react-bootstrap'
+import { Link, useParams } from 'react-router-dom'
+import { toast } from 'react-toastify'
+import CommentForm from './CommentForm'
+import timeSince from '../components/TimeSince'
+import Paginate from './Paginate' // Make sure you have this component
+import Loading from '../components/Loading'
+
+const GetPost = () => {
+  const { pageNumber, keyword } = useParams()
+  const {
+    data,
+    error,
+    isLoading,
+    refetch,
+  } = useGetPostsQuery({ keyword, pageNumber })
+
+  const [deletePost, { isLoading: loadingDelete }] = useDeletePostMutation()
+  const [deleteComment] = useDeleteCommentMutation()
+  const [likePost] = useLikePostMutation()
+  const [unlikePost] = useUnlikePostMutation()
+
+  const { userInfo } = useSelector((state) => state.auth)
+
+  const deleteHandler = async (id) => {
+    if (window.confirm('Are you sure')) {
+      try {
+        await deletePost(id).unwrap()
+        refetch()
+        toast.success('Post deleted')
+      } catch (error) {
+        toast.error(error?.data?.message || error.error)
+      }
+    }
+  }
+
+  const [likeCounts, setLikeCounts] = useState({})
+
+  useEffect(() => {
+    if (data) {
+      const initialLikeCounts = data.posts.reduce((acc, post) => {
+        acc[post._id] = post.likes.length
+        return acc
+      }, {})
+      setLikeCounts(initialLikeCounts)
+    }
+  }, [data])
+
+  const handleLikeToggle = async (postId) => {
+    const post = data.posts.find((p) => p._id === postId)
+    const alreadyLiked = post.likes.includes(userInfo._id)
+
+    try {
+      if (!alreadyLiked) {
+        await likePost(postId).unwrap()
+        refetch()
+      } else {
+        await unlikePost(postId).unwrap()
+        refetch()
+      }
+    } catch (error) {
+      console.error('Error toggling like:', error)
+    }
+  }
+
+  const handleDeleteComment = async (postId, commentId) => {
+    if (window.confirm('Are you sure you want to delete this comment?')) {
+      try {
+        await deleteComment({ postId, commentId }).unwrap()
+        refetch()
+        toast.success('Comment deleted')
+      } catch (error) {
+        toast.error('Error deleting comment')
+      }
+    }
+  }
+
+  const onCommentAdded = () => {
+    refetch()
+  }
+  if (isLoading) return<Loading/>
+  if (error) return <div>Error: {error.message}</div>
+if (keyword && (!data.posts || data.posts.length === 0)) {
+  return (
+    <div>
+      <p>Search not found</p>
+      <Link to='/' className='btn btn-light'>
+        Go Back
+      </Link>
+    </div>
+  )
+}
+  return (
+    <Card className='my-3 p-3 rounded get-post'>
+      {data &&
+        data.posts.map((post) => (
+          <div key={post._id} className='mb-4'>
+            <img
+              src={
+                post.user && post.user.image
+                  ? post.user.image
+                  : 'defaultImagePath'
+              }
+              alt={post.user ? post.user.name : 'Default Name'}
+              className='profile-picture'
+            />
+            <h3>{post.user ? post.user.name : 'Unknown User'}</h3>
+            <p className='post-content'>{post.content}</p>
+            <p>Posted on: {timeSince(new Date(post.createdAt))}</p>
+            {post.image && (
+              <div>
+                <img
+                  src={post.image}
+                  alt='Post'
+                  className='img-fluid post-image'
+                />
+                <div className='likes'>
+                  <span onClick={() => handleLikeToggle(post._id)}>
+                    <FaHeart style={{ cursor: 'pointer' }} />
+                    {likeCounts[post._id]} likes
+                  </span>
+                </div>
+              </div>
+            )}
+
+            {post.comments &&
+              post.comments.map((comment) => (
+                <div key={comment._id} className='comment-section'>
+                  <strong>
+                    {comment.user ? comment.user.name : 'Unknown User'}:
+                  </strong>
+                  <p className='comment-text'>
+                    <FaComment /> {comment.text}
+                  </p>
+                  <div>
+                    <small>
+                      Comment on: {timeSince(new Date(comment.createdAt))}
+                    </small>
+                    {userInfo &&
+                      userInfo._id ===
+                        (comment.user ? comment.user._id : '') && (
+                        <FaTrash
+                          style={{ cursor: 'pointer', marginLeft: '10px' }}
+                          onClick={() =>
+                            handleDeleteComment(post._id, comment._id)
+                          }
+                        />
+                      )}
+                  </div>
+                </div>
+              ))}
+            <CommentForm postId={post._id} onCommentAdded={onCommentAdded} />
+          </div>
+        ))}
+
+      <Paginate
+        pages={data.pages}
+        page={data.page}
+        keyword={keyword ? keyword : ''}
+      />
+    </Card>
+  )
+}
+
+export default GetPost
+
+{userInfo && userInfo._id === post.user._id && (
+              <Button
+                variant='danger'
+                className='btn-sm'
+                onClick={() => deleteHandler(post._id)}
+                disabled={loadingDelete}
+              >
+                <FaTrash />
+              </Button>
+            )}

@@ -1,8 +1,14 @@
 import React from 'react'
+import FriendRequests from './FriendRequest'
+import SendFriendRequest from './SendRequest'
+import UserListAndFriendRequests from './UserListAndFriendRequests'
+
 const PostFriend = () => {
   return (
     <div className='post-friend'>
-      post friend
+      <SendFriendRequest/>
+     <FriendRequests/>
+     <UserListAndFriendRequests/>
     </div>
   )
 }

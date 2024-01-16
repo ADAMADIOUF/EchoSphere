@@ -8,12 +8,14 @@ import TopBar from '../components/TopBar'
 const PostContent = () => {
   return (
     <>
-    <TopBar/>
+      <TopBar />
       <div className='section-center postContent'>
-        <PostLocation />
-        <Post />
+        <div>
+          <PostLocation />
+          <PostFriend />
+        </div>
 
-        <PostFriend />
+        <Post />
       </div>
     </>
   )

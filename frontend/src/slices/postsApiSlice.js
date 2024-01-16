@@ -14,6 +14,7 @@ export const postsApiSlice = apiSlice.injectEndpoints({
           pageNumber,
         },
       }),
+      providesTags: ['Posts'], 
     }),
     getPostById: builder.query({
       query: (id) => `${POSTS_URL}/${id}`,
@@ -24,6 +25,7 @@ export const postsApiSlice = apiSlice.injectEndpoints({
         method: 'POST',
         body: data,
       }),
+      invalidatesTags: ['Posts'],
     }),
     updatePost: builder.mutation({
       query: ({ id, ...data }) => ({

@@ -158,14 +158,12 @@ p {
   gap: 5rem;
 }
 .post-location{
-  flex: 1;
+  flex: 2;
 }
 .post{
   flex: 1;
 }
-.post-friend{
-  flex: 1;
-}
+
 .post-search{
   background-color: #000;
   color: white;

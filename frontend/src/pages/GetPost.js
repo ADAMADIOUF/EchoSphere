@@ -61,11 +61,15 @@ const GetPost = () => {
     try {
       if (!alreadyLiked) {
         await likePost(postId).unwrap()
-        refetch()
+        // Update likeCounts state
+        setLikeCounts((prev) => ({ ...prev, [postId]: prev[postId] + 1 }))
       } else {
         await unlikePost(postId).unwrap()
-        refetch()
+        // Update likeCounts state
+        setLikeCounts((prev) => ({ ...prev, [postId]: prev[postId] - 1 }))
       }
+      // Optional: refetch to sync with server data
+      refetch()
     } catch (error) {
       console.error('Error toggling like:', error)
     }

@@ -58,7 +58,6 @@ const registerUser = asyncHandler(async (req, res) => {
     throw new Error('Invalid user data')
   }
 })
-
 const logoutUser = asyncHandler(async (req, res) => {
   res.cookie('jwt', '', {
     httpOnly: true,

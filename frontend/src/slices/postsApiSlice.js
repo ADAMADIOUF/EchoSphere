@@ -14,7 +14,7 @@ export const postsApiSlice = apiSlice.injectEndpoints({
           pageNumber,
         },
       }),
-      providesTags: ['Posts'], 
+      providesTags: ['Posts'],
     }),
     getPostById: builder.query({
       query: (id) => `${POSTS_URL}/${id}`,
@@ -33,12 +33,14 @@ export const postsApiSlice = apiSlice.injectEndpoints({
         method: 'PUT',
         body: data,
       }),
+      invalidatesTags: ['Posts'],
     }),
     deletePost: builder.mutation({
       query: (id) => ({
         url: `${POSTS_URL}/${id}`,
         method: 'DELETE',
       }),
+      invalidatesTags: ['Posts'],
     }),
     uploadPostImage: builder.mutation({
       query: (data) => ({
@@ -58,6 +60,7 @@ export const postsApiSlice = apiSlice.injectEndpoints({
         url: `${POSTS_URL}/${postId}/unlike`,
         method: 'PUT',
       }),
+      invalidatesTags: ['Posts'],
     }),
     addComment: builder.mutation({
       query: ({ postId, text }) => ({
@@ -65,12 +68,14 @@ export const postsApiSlice = apiSlice.injectEndpoints({
         method: 'POST',
         body: { text },
       }),
+      invalidatesTags: ['Posts'],
     }),
     deleteComment: builder.mutation({
       query: ({ postId, commentId }) => ({
         url: `${POSTS_URL}/${postId}/comments/${commentId}`,
         method: 'DELETE',
       }),
+      invalidatesTags: ['Posts'],
     }),
   }),
 })

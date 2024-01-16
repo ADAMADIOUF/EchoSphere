@@ -158,7 +158,58 @@ const updateUser = asyncHandler(async (req, res) => {
     throw new Error('User not  found')
   }
 })
+// Send a friend request
+ const sendFriendRequest = async (req, res) => {
+  try {
+    const { userId, recipientId } = req.body;
+    
+    // Add recipientId to the sender's friendRequestsSent array
+    await User.findByIdAndUpdate(userId, { $push: { friendRequestsSent: recipientId } });
+    
+    // Add userId to the recipient's friendRequestsReceived array
+    await User.findByIdAndUpdate(recipientId, { $push: { friendRequestsReceived: userId } });
 
+    res.status(200).json({ message: 'Friend request sent successfully' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Error sending friend request' });
+  }
+};
+
+// Handle friend requests received
+ const handleFriendRequest = async (req, res) => {
+  try {
+    const { userId, senderId, accept } = req.body;
+
+    if (accept) {
+      // If the user accepts the friend request, add senderId to their followers and followings arrays
+      await User.findByIdAndUpdate(userId, { $push: { followers: senderId, followings: senderId } });
+      await User.findByIdAndUpdate(senderId, { $push: { followers: userId, followings: userId } });
+    }
+
+    // Remove senderId from userId's friendRequestsReceived array
+    await User.findByIdAndUpdate(userId, { $pull: { friendRequestsReceived: senderId } });
+
+    res.status(200).json({ message: 'Friend request handled successfully' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Error handling friend request' });
+  }
+};
+
+// Get friend suggestions (you can implement your logic for suggesting friends here)
+  const getFriendSuggestions = async (req, res) => {
+  try {
+    // Implement your logic to get friend suggestions based on user interests, connections, etc.
+    const userId = req.params.userId;
+    const suggestions = []; // Add your suggested friends to this array
+
+    res.status(200).json(suggestions);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Error fetching friend suggestions' });
+  }
+};
 export {
   authUser,
   registerUser,
@@ -169,4 +220,7 @@ export {
   deleteUser,
   getUserByID,
   updateUser,
+  sendFriendRequest,
+  handleFriendRequest,
+  getFriendSuggestions,
 }

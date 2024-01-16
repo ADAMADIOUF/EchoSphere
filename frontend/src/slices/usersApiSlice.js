@@ -6,14 +6,14 @@ export const usersApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     login: builder.mutation({
       query: (data) => ({
-        url: `${USERS_URL}/login`, 
+        url: `${USERS_URL}/login`,
         method: 'POST',
         body: data,
       }),
     }),
     register: builder.mutation({
       query: (data) => ({
-        url: `${USERS_URL}`, 
+        url: `${USERS_URL}`,
         method: 'POST',
         body: data,
       }),
@@ -58,6 +58,25 @@ export const usersApiSlice = apiSlice.injectEndpoints({
       }),
       invalidatesTags: ['Users'],
     }),
+    sendFriendRequest: builder.mutation({
+      query: (data) => ({
+        url: `${USERS_URL}/sendFriendRequest`,
+        method: 'POST',
+        body: data,
+      }),
+    }),
+    handleFriendRequest: builder.mutation({
+      query: (data) => ({
+        url: `${USERS_URL}/handleFriendRequest`,
+        method: 'POST',
+        body: data,
+      }),
+    }),
+    getFriendSuggestions: builder.query({
+      query: (userId) => ({
+        url: `${USERS_URL}/getFriendSuggestions/${userId}`,
+      }),
+    }),
   }),
 })
 
@@ -70,4 +89,7 @@ export const {
   useDeleteUserMutation,
   useGetUserDetailsQuery,
   useUpdateUserMutation,
+  useSendFriendRequestMutation,
+  useHandleFriendRequestMutation,
+  useGetFriendSuggestionsQuery,
 } = usersApiSlice

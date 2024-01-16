@@ -3,41 +3,38 @@ import { FRIEND_REQUESTS_URL } from '../constants'
 
 export const friendRequestApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
+    // Send a friend request
     sendFriendRequest: builder.mutation({
-      query: ({ recipientId }) => ({
+      query: (receiverId) => ({
         url: FRIEND_REQUESTS_URL,
         method: 'POST',
-        body: { recipientId },
+        body: { receiverId },
       }),
-      invalidatesTags: ['FriendRequests'],
     }),
+
+    // Accept a friend request
     acceptFriendRequest: builder.mutation({
       query: (requestId) => ({
-        url: `${FRIEND_REQUESTS_URL}/accept/${requestId}`,
+        url: `${FRIEND_REQUESTS_URL}/${requestId}/accept`,
         method: 'PUT',
       }),
-      invalidatesTags: ['FriendRequests'],
     }),
-    declineFriendRequest: builder.mutation({
+
+    // Reject a friend request
+    rejectFriendRequest: builder.mutation({
       query: (requestId) => ({
-        url: `${FRIEND_REQUESTS_URL}/decline/${requestId}`,
+        url: `${FRIEND_REQUESTS_URL}/${requestId}/reject`,
         method: 'PUT',
       }),
-      invalidatesTags: ['FriendRequests'],
     }),
-    getFriendRequests: builder.query({
-      query: () => ({
-        url: FRIEND_REQUESTS_URL,
-        method: 'GET',
-      }),
-      providesTags: ['FriendRequests'],
-    }),
+
+    // Add other friend request-related endpoints as needed
   }),
 })
 
 export const {
   useSendFriendRequestMutation,
   useAcceptFriendRequestMutation,
-  useDeclineFriendRequestMutation,
-  useGetFriendRequestsQuery,
+  useRejectFriendRequestMutation,
+  // Add other hook names for additional endpoints here
 } = friendRequestApiSlice

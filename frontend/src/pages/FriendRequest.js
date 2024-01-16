@@ -1,59 +1,31 @@
 import React from 'react'
-import {
-  useGetFriendRequestsQuery,
-  useAcceptFriendRequestMutation,
-  useDeclineFriendRequestMutation,
-} from '../slices/friendrequestSlice'
+import { useGetFriendSuggestionsQuery } from '../slices/usersApiSlice' // Update with the correct path
+import SendFriendRequest from './SendRequest' // Import the SendFriendRequest component
+import { useParams } from 'react-router-dom'
 
-const FriendRequest = () => {
-  const {
-    data: friendRequests,
-    isLoading,
-    isError,
-  } = useGetFriendRequestsQuery()
-
-  const [acceptFriendRequest] = useAcceptFriendRequestMutation()
-  const [declineFriendRequest] = useDeclineFriendRequestMutation()
-
-  if (isLoading) return <p>Loading...</p>
-  if (isError || !friendRequests || !Array.isArray(friendRequests.posts)) {
-    return <p>Error loading friend requests.</p>
-  }
-
-  const handleAccept = async (requestId) => {
-    try {
-      await acceptFriendRequest(requestId).unwrap()
-      // additional logic after accepting
-    } catch (error) {
-      console.error('Error accepting friend request:', error)
-    }
-  }
-
-  const handleDecline = async (requestId) => {
-    try {
-      await declineFriendRequest(requestId).unwrap()
-      // additional logic after declining
-    } catch (error) {
-      console.error('Error declining friend request:', error)
-    }
+const FriendRequestsReceived = () => {
+  const { id: userId } = useParams()
+  const { data: friendSuggestions } = useGetFriendSuggestionsQuery(userId)
+console.log(friendSuggestions);
+  if (!friendSuggestions) {
+    return <div>Loading friend suggestions...</div> // Handle the loading state
   }
 
   return (
     <div>
-      <h2>Friend Requests</h2>
-      {friendRequests.posts.map((request) => (
-        <div key={request._id}>
-          {/* Check for the existence of requester and its properties */}
-          <p>
-            Request from:{' '}
-            {request.requester ? request.requester.name : 'Unknown'}
-          </p>
-          <button onClick={() => handleAccept(request._id)}>Accept</button>
-          <button onClick={() => handleDecline(request._id)}>Decline</button>
-        </div>
-      ))}
+      <h2>Friend Requests Received</h2>
+      <h3>comming soon</h3>
+      <ul>
+        {friendSuggestions.map((suggestion) => (
+          <li key={suggestion.id}>
+            <img src={suggestion.image} alt={`${suggestion.name}'s profile`} />
+            {suggestion.name}{' '}
+            <SendFriendRequest userId={userId} recipientId={suggestion.id} />
+          </li>
+        ))}
+      </ul>
     </div>
   )
 }
 
-export default FriendRequest
+export default FriendRequestsReceived

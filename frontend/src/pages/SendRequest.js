@@ -1,23 +1,20 @@
 import React from 'react'
-import { useSendFriendRequestMutation } from '../slices/friendrequestSlice'
+import { useSendFriendRequestMutation } from '../slices/usersApiSlice' // Update with the correct path
+import { toast } from 'react-toastify'
 
-const SendFriendRequest = ({ recipientId }) => {
-  const [sendFriendRequest, { isLoading, isSuccess, isError }] =
-    useSendFriendRequestMutation()
+const SendFriendRequest = ({ userId, recipientId }) => {
+  const [sendFriendRequestMutation] = useSendFriendRequestMutation()
 
-  const handleSendRequest = async () => {
-    await sendFriendRequest({ recipientId })
+  const handleSendFriendRequest = async () => {
+    try {
+      await sendFriendRequestMutation({ userId, recipientId })
+      toast.success('Friend request sent successfully')
+    } catch (error) {
+      toast.error('Error sending friend request')
+    }
   }
 
-  return (
-    <div>
-      <button onClick={handleSendRequest} disabled={isLoading}>
-        Send Friend Request
-      </button>
-      {isSuccess && <p>Request sent!</p>}
-      {isError && <p>Error sending request.</p>}
-    </div>
-  )
+  return <button onClick={handleSendFriendRequest}>Send Friend Request</button>
 }
 
 export default SendFriendRequest

@@ -8,7 +8,7 @@ const PostFriend = () => {
     <div className='post-friend'>
       <SendFriendRequest/>
      <FriendRequests/>
-     <UserListAndFriendRequests/>
+     {/* <UserListAndFriendRequests/> */}
     </div>
   )
 }
